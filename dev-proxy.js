@@ -42,5 +42,7 @@ function createProxy(targetURL, port) {
 }
 
 // Create two proxy instances with different target URLs and ports
-createProxy("https://api.qubic.li", 7003);
+// createProxy("https://api.qubic.li", 7003);
 createProxy("https://testapi.qubic.org", 7004);
+createProxy("http://116.202.157.215:8000", 7003);
+// createProxy("http://116.202.157.215:8080", 7004);

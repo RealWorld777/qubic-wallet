@@ -35,7 +35,7 @@ export class UpdaterService {
   }
 
   private init(): void {
-    this.numberLastEpoch =  this.walletService.getSettings().numberLastEpoch;
+    this.numberLastEpoch = this.walletService.getSettings().numberLastEpoch;
     this.getStatusArchiver();
     this.getCurrentTickArchiver();
     this.getCurrentBalance();
@@ -46,7 +46,7 @@ export class UpdaterService {
     // every 30 seconds
     setInterval(() => {
       this.getStatusArchiver();
-      this.getCurrentTickArchiver();            
+      this.getCurrentTickArchiver();
     }, 30000);
     // every minute
     setInterval(() => {
@@ -81,23 +81,32 @@ export class UpdaterService {
    * should load the current balances for the accounts
    * @returns 
    */
-  private getCurrentBalance(force = false) {
+  private async getCurrentBalance(force = false) {
     if (!force && (this.balanceLoading || !this.isActive))
       return;
-
+  
     this.balanceLoading = true;
-    if (this.walletService.getSeeds().length > 0) {
-      // todo: Use Websocket!
-      this.api.getCurrentBalance(this.walletService.getSeeds().map(m => m.publicId)).subscribe(r => {
-        if (r) {
-          this.currentBalance.next(r);
-          this.addTransactions(r.flatMap((b) => b.transactions).filter(this.onlyUniqueTx).sort((a, b) => { return b.targetTick - a.targetTick }))
+    
+    try {
+      if (this.walletService.getSeeds().length > 0) {
+        const publicIds = this.walletService.getSeeds().map(m => m.publicId);
+  
+        const balances = await this.api.getCurrentBalance(publicIds);
+        console.log(balances)
+        if (balances) {
+          this.currentBalance.next(balances as BalanceResponse[]);
+  
+          const transactions = balances.flatMap((b) => b.transactions)
+            .filter(this.onlyUniqueTx)
+            .sort((a, b) => b.targetTick - a.targetTick);
+  
+          this.addTransactions(transactions);
         }
-        this.balanceLoading = false;
-      }, errorResponse => {
-        this.processError(errorResponse, false);
-        this.balanceLoading = false;
-      });
+      }
+    } catch (error) {
+      this.processError(error, false);
+    } finally {
+      this.balanceLoading = false;
     }
   }
 
@@ -169,8 +178,8 @@ export class UpdaterService {
     this.apiArchiver.getCurrentTick().subscribe(latestTick => {
       if (latestTick) {
         this.currentTick.next(latestTick);
-        if(this.transactionsArray.getValue().length <= 0){
-          this.getTransactionsArchiver();          
+        if (this.transactionsArray.getValue().length <= 0) {
+          this.getTransactionsArchiver();
         }
       }
       this.tickLoading = false;
@@ -182,7 +191,7 @@ export class UpdaterService {
 
 
   private getTransactionsArchiver(publicIds: string[] | undefined = undefined): void {
-    this.numberLastEpoch =  this.walletService.getSettings().numberLastEpoch;
+    this.numberLastEpoch = this.walletService.getSettings().numberLastEpoch;
     if ((this.transactionArchiverLoading || this.currentTick.value === 0 || !this.status))
       return;
 
@@ -222,7 +231,7 @@ export class UpdaterService {
         this.transactionsArray.next(allTransactions);
         this.transactionArchiverLoading = false;
       }, errorResponse => {
-        console.error('errorResponse:', errorResponse); 
+        console.error('errorResponse:', errorResponse);
         this.transactionArchiverLoading = false;
       });
     }
