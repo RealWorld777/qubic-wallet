@@ -69,26 +69,35 @@ export class ApiService {
 
   public async getCurrentBalance(publicIds: string[]): Promise<any[]> {
     let result: any[] = [];
-  
+
     for (let i = 0; i < publicIds.length; i++) {
       let localVarPath = `/balances/${publicIds[i]}`;
-  
+
       const balanceResponse = await this.httpClient.request<any>('get', `${this.basePath}${localVarPath}`, {
         context: new HttpContext(),
         headers: {
           "Content-Type": "application/json"
         },
-        
+
         responseType: 'json'
       }).toPromise();
-  
+
       if (balanceResponse) {
-        result.push(balanceResponse.balance);
+        result.push({
+          publicId: balanceResponse.balance.id,
+          computorIndex: 0,
+          isComputor: false,
+          epochBaseAmount: Number(balanceResponse.balance.balance),
+          currentEstimatedAmount: Number(balanceResponse.balance.balance),
+          epochChanges: 0,
+          baseDate: Date,
+          transactions: [],
+        });
       }
     }
     return result;
   }
-  
+
 
   public getNetworkBalances(publicIds: string[]) {
     let localVarPath = `/Wallet/NetworkBalances`;
@@ -155,7 +164,7 @@ export class ApiService {
         body: submitTransaction,
         responseType: 'json'
       })
-    }
+  }
 
   public getCurrentTick() {
     let localVarPath = `/Public/CurrentTick`;
