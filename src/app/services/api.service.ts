@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthResponse, BalanceResponse, ContractDto, CurrentTickResponse, MarketInformation, NetworkBalance, PeerDto, ProposalCreateRequest, ProposalCreateResponse, ProposalDto, QubicAsset, SubmitTransactionRequest, SubmitTransactionResponse, Transaction } from './api.model';
+import { AuthResponse, BalanceResponse, ContractDto, CurrentTickResponse, MarketInformation, NetworkBalance, PeerDto, ProposalCreateRequest, ProposalCreateResponse, ProposalDto, QubicAsset, QuerySmartContract, SubmitTransactionRequest, SubmitTransactionResponse, Transaction } from './api.model';
 import {
   HttpClient, HttpHeaders, HttpParams,
   HttpResponse, HttpEvent, HttpParameterCodec, HttpContext
@@ -9,6 +9,7 @@ import { AuthInterceptor } from './auth-interceptor';
 import { environment } from '../../environments/environment';
 import { map, Observable, of } from 'rxjs';
 import { TokenService } from './token.service';
+import { WalletService } from './wallet.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class ApiService {
   private basePath = environment.apiQliUrl;
   private authenticationActive = false;
 
-  constructor(protected httpClient: HttpClient, private tokenSerice: TokenService, private authInterceptor: AuthInterceptor) {
+  constructor(private walletService: WalletService, protected httpClient: HttpClient, private tokenSerice: TokenService, private authInterceptor: AuthInterceptor) {
     this.reAuthenticate();
   }
 
@@ -81,14 +82,15 @@ export class ApiService {
 
         responseType: 'json'
       }).toPromise();
+      await this.walletService.updateBalance(balanceResponse.balance.id, Number(balanceResponse.balance.balance), 999999);
 
       if (balanceResponse) {
         result.push({
           publicId: balanceResponse.balance.id,
           computorIndex: 0,
           isComputor: false,
-          epochBaseAmount: Number(balanceResponse.balance.balance),
-          currentEstimatedAmount: Number(balanceResponse.balance.balance),
+          epochBaseAmount: 0,
+          currentEstimatedAmount: 0,
           epochChanges: 0,
           baseDate: Date,
           transactions: [],
@@ -137,6 +139,19 @@ export class ApiService {
     );
   }
 
+  public querySmartContract(jsonData: QuerySmartContract) {
+    const localVarPath = "/querySmartContract";
+    return this.httpClient.request<any>('post', `${this.basePath}${localVarPath}`,
+      {
+        context: new HttpContext(),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: jsonData,
+        responseType: 'json'
+      }
+    );
+  }
 
 
   public getCurrentIpoBids(publicIds: string[]) {

@@ -152,3 +152,9 @@ export interface QubicAsset {
   issuerIdentity: string;
 }
 
+export interface QuerySmartContract {
+  contractIndex: number, 
+  inputType: number,
+  inputSize: number,
+  requestData: string,
+}
