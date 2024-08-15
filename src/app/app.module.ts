@@ -81,6 +81,9 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { QearnComponent } from './qearn/qearn.component';
 import { RewardTableComponent } from './qearn/reward-table/reward-table.component';
+import { StakingComponent } from './qearn/staking/staking.component';
+import { HistoryComponent } from './qearn/history/history.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 /** Http interceptor providers in outside-in order */
 export const httpInterceptorProviders = [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }];
@@ -92,6 +95,8 @@ export const httpInterceptorProviders = [{ provide: HTTP_INTERCEPTORS, useClass:
     NavigationComponent,
     PaymentComponent,
     QearnComponent,
+    StakingComponent,
+    HistoryComponent,
     LockComponent,
     LockConfirmDialog,
     UnLockComponent,
@@ -144,6 +149,7 @@ export const httpInterceptorProviders = [{ provide: HTTP_INTERCEPTORS, useClass:
     MatDialogModule,
     MatSnackBarModule,
     MatTableModule,
+    MatPaginatorModule,
     MatSortModule,
     ClipboardModule,
     MatTooltipModule,

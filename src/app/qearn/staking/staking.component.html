@@ -1,0 +1,94 @@
+<ng-container *transloco="let t">
+    <form [formGroup]="stakeForm" novalidate (ngSubmit)="onSubmit()" class="content_container gap-4">
+        <mat-card class="general-card">
+            <mat-card-content>
+                <div class="example-stake">
+                    <mat-label class="label-container">{{ t('qearn.stakeQubic.title') }}</mat-label>
+                    <div class="subText">{{ t('qearn.stakeQubic.subText') }}</div>
+                    <div class="col">
+                        <mat-form-field appearance="fill" placeholder="Sender Seed" class="full-width">
+                            <mat-label>{{ t('paymentComponent.form.sourceSeed.label') }}</mat-label>
+                            <mat-select formControlName="sourceId" panelClass="full-width">
+                                <mat-option *ngFor="let seed of getSeeds(); let i = index" [value]="seed.publicId"
+                                    class="custom-mat-option">
+                                    {{ seed.publicId }}<br />
+                                    {{ seed.alias }} - {{ seed.balance | number : '1.0-0' }}
+                                    {{ t('general.currency') }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="stakeForm.controls['sourceId'].hasError('required')">
+                                {{ t('paymentComponent.form.sourceSeed.error.required') }}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="amount-input">
+                            <mat-label>{{ t('qearn.stakeQubic.enterAmount') }}</mat-label>
+                            <input matInput #input formControlName="amount" type="number"
+                                (input)="validateAmount($event)" />
+                            <mat-error *ngIf="stakeForm.controls['amount'].hasError('required')">
+                                {{ t('qearn.stakeQubic.error.required') }}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="stakeForm.controls['amount'].hasError('min') && !stakeForm.controls['amount'].hasError('required')">
+                                {{ t('qearn.stakeQubic.error.min') }}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="stakeForm.controls['amount'].hasError('pattern') && !stakeForm.controls['amount'].hasError('required') && !stakeForm.controls['amount'].hasError('min')">
+                                {{ t('qearn.stakeQubic.error.numberOnly') }}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="stakeForm.controls['amount'].hasError('exceedsBalance') && !stakeForm.controls['amount'].hasError('required') && !stakeForm.controls['amount'].hasError('min') && !stakeForm.controls['amount'].hasError('pattern')">
+                                {{ t('qearn.stakeQubic.error.exceedsBalance') }}
+                            </mat-error>
+                        </mat-form-field>
+                        <div class="mat-toolbar example-balance">
+                            <span>{{ t('qearn.stakeQubic.availableBalance') }}</span>
+                            <span>{{ maxAmount }}</span>
+                        </div>
+                    </div>
+                    <button color="accent" mat-raised-button class="full-width button" (click)="confirmLock()"
+                        [disabled]="stakeForm.invalid">
+                        {{ t('qearn.stakeQubic.stake') }}
+                    </button>
+                    <div class="stake-col">
+                        <span class="stake-bottom">{{ t('qearn.stakeQubic.weeklySatking') }}</span>
+                        <span class="stake-bottom stake-bottom-value">{{ remainingTime.days }} {{
+                            t('qearn.stakeQubic.date') }} {{
+                            remainingTime.hours }} {{ t('qearn.stakeQubic.hour') }} {{ remainingTime.minutes }} {{
+                            t('qearn.stakeQubic.minute') }}</span>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+        <!-- <mat-card class="mt-4 general-card">
+            <mat-card-content>
+                <div class="balance">
+                    <div class="balance balance-rewards">
+                        <mat-icon svgIcon="reward_icon"></mat-icon>
+                        <div class="rewards_flex_column">
+                            <span class="subText">{{ t('qearn.Earned.rewards') }} </span>
+                            <span class="value value"> 300000 </span>
+                        </div>
+                    </div>
+                    <div class="unlock">{{ t('qearn.Earned.unlockEarly') }}</div>
+                </div>
+                <mat-divider class="my-4"></mat-divider>
+                <div class="stake-col">
+                    <div class="rewards_flex_column">
+                        <span class="subText text-md">{{ t('qearn.Earned.rewards') }} </span>
+                        <span> 10,442,000,000</span>
+                    </div>
+                    <div class="rewards_flex_column">
+                        <span class="subText text-md">{{ t('qearn.Earned.earningRate') }} </span>
+                        <span> 9.8% {{ t('qearn.Earned.apy') }} </span>
+                    </div>
+                    <div class="rewards_flex_column">
+                        <span class="subText text-md">{{ t('qearn.Earned.unlocksIn') }} </span>
+                        <span>48 {{ t('qearn.Earned.weeks') }} </span>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card> -->
+    </form>
+</ng-container>

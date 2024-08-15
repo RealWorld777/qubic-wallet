@@ -1,0 +1,46 @@
+.stake-history {
+  width: 100%;
+  overflow-x: auto; /* Makes the table scrollable horizontally on small screens */
+}
+
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Adds momentum scrolling for iOS devices */
+}
+
+table {
+  width: 100%; /* Ensures the table takes up 100% width */
+  min-width: 600px; /* Ensures the table does not get too small */
+}
+
+th.mat-header-cell,
+td.mat-cell {
+  white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.unlock {
+  background: none;
+  color: #61f0fe;
+  padding: 8px 24px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  /* On smaller screens, make some columns less important */
+  th.mat-header-cell,
+  td.mat-cell {
+    font-size: 12px; /* Reduce font size */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* On very small screens, hide some less critical columns */
+  th.mat-header-cell:nth-child(4),
+  td.mat-cell:nth-child(4),
+  th.mat-header-cell:nth-child(5),
+  td.mat-cell:nth-child(5) {
+    display: none;
+  }
+}

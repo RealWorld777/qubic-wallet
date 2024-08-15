@@ -1,0 +1,154 @@
+.form-container {
+  display: flex;
+  flex-direction: column;
+  column-gap: 10px;
+  row-gap: 0px;
+}
+
+.general-card {
+  margin-bottom: 10px;
+  min-width: 120px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.example-h2 {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.example-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
+}
+
+.example-margin {
+  margin: 8px;
+}
+
+.example-width {
+  max-width: 180px;
+  width: 100%;
+}
+
+.mat-mdc-slider {
+  width: 100%;
+}
+
+.mat-mdc-card + .mat-mdc-card {
+  margin-top: 8px;
+}
+
+.example-result-card h2 {
+  margin: 0 8px;
+}
+
+.example-label-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 10px 0;
+}
+
+.example-result-card example-value-label {
+  font-weight: 600;
+}
+
+.example-value-label {
+  // padding-right: 20px;
+  width: 80px;
+}
+
+.label-container {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  margin-top: 12px;
+}
+
+.subText {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  opacity: 0.5;
+}
+.balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  &-rewards {
+    justify-content: start;
+    gap: 12px;
+  }
+}
+.example-balance {
+  background: none;
+  opacity: 0.2;
+  padding: 0 8px;
+  margin-top: -16px;
+}
+
+.button {
+  width: 100%;
+  margin: 0;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.example-stake {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stake-bottom {
+  font-size: 14px;
+  padding: 0 8px;
+  opacity: 0.5;
+  &-value {
+    opacity: 1;
+  }
+}
+.stake-col {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+}
+.rewards_flex_column {
+  display: flex;
+  padding-right: 24px;
+  min-width: 112px;
+  flex-direction: column;
+  span {
+    padding: 3px;
+  }
+}
+
+.unlock {
+  background: none;
+  color: #61f0fe;
+  padding: 8px 24px;
+  cursor: pointer;
+}
+
+.text-md {
+  font-size: 14px !important;
+}
+
+.py-4 {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.my-4 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+.amount-input {
+  margin-bottom: 18px;
+}

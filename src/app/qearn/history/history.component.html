@@ -1,0 +1,64 @@
+<ng-container *transloco="let t">
+  <div class="content_container stake-history">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+        <!-- Locked Epoch Column -->
+        <ng-container matColumnDef="lockedEpoch">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Locked Epoch </th>
+          <td mat-cell *matCellDef="let element"> {{ element.lockedEpoch }} </td>
+        </ng-container>
+
+        <!-- Locked Amount Column -->
+        <ng-container matColumnDef="lockedAmount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Locked Amount </th>
+          <td mat-cell *matCellDef="let element"> {{ element.lockedAmount }} </td>
+        </ng-container>
+
+        <!-- Locked Weeks Column -->
+        <ng-container matColumnDef="lockedWeeks">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Locked Weeks </th>
+          <td mat-cell *matCellDef="let element"> {{ element.lockedWeeks }} </td>
+        </ng-container>
+
+        <!-- Total Locked Amount in Epoch Column -->
+        <ng-container matColumnDef="totalLockedAmountInEpoch">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Locked Amount (this Epoch) </th>
+          <td mat-cell *matCellDef="let element"> {{ element.totalLockedAmountInEpoch }} </td>
+        </ng-container>
+
+        <!-- Current Bonus Amount in Epoch Column -->
+        <ng-container matColumnDef="currentBonusAmountInEpoch">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Current Bonus Amount (this Epoch) </th>
+          <td mat-cell *matCellDef="let element"> {{ element.currentBonusAmountInEpoch }} </td>
+        </ng-container>
+
+        <!-- Early Unlock % Column -->
+        <ng-container matColumnDef="earlyUnlockPercent">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Early Locking Reward </th>
+          <td mat-cell *matCellDef="let element"> {{ element.earlyUnlockPercent }} </td>
+        </ng-container>
+
+        <!-- Full Unlock % Column -->
+        <ng-container matColumnDef="fullUnlockPercent">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Full Unlocking Reward </th>
+          <td mat-cell *matCellDef="let element"> {{ element.fullUnlockPercent }} </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let element">
+            <div mat-raised-button class="unlock" color="primary" (click)="openEarlyUnlockModal(element)">
+              {{ t('qearn.Earned.unlockEarly') }}
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </div>
+</ng-container>

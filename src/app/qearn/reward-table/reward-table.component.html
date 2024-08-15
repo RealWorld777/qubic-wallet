@@ -1,35 +1,39 @@
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-    <!-- Week-From Column -->
-    <ng-container matColumnDef="weekFrom">
-        <th mat-header-cell *matHeaderCellDef> Week From </th>
-        <td mat-cell *matCellDef="let element"> {{element.weekFrom}} </td>
-    </ng-container>
+<ng-container *transloco="let t">
+    <div class="content_container gap-4">
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <!-- Week-From Column -->
+            <ng-container matColumnDef="weekFrom">
+                <th mat-header-cell *matHeaderCellDef> Week From </th>
+                <td mat-cell *matCellDef="let element"> {{element.weekFrom}} </td>
+            </ng-container>
 
-    <!-- Week-To Column -->
-    <ng-container matColumnDef="weekTo">
-        <th mat-header-cell *matHeaderCellDef> Week To </th>
-        <td mat-cell *matCellDef="let element"> {{element.weekTo}} </td>
-    </ng-container>
+            <!-- Week-To Column -->
+            <ng-container matColumnDef="weekTo">
+                <th mat-header-cell *matHeaderCellDef> Week To </th>
+                <td mat-cell *matCellDef="let element"> {{element.weekTo}} </td>
+            </ng-container>
 
-    <!-- Early Unlock % Column -->
-    <ng-container matColumnDef="earlyUnlock">
-        <th mat-header-cell *matHeaderCellDef> Early Unlock % </th>
-        <td mat-cell *matCellDef="let element"> {{element.earlyUnlock}} </td>
-    </ng-container>
+            <!-- Early Unlock % Column -->
+            <ng-container matColumnDef="earlyUnlock">
+                <th mat-header-cell *matHeaderCellDef> Early Unlock % </th>
+                <td mat-cell *matCellDef="let element"> {{element.earlyUnlock}} </td>
+            </ng-container>
 
-    <!-- Burn % Column -->
-    <ng-container matColumnDef="burn">
-        <th mat-header-cell *matHeaderCellDef> Burn % </th>
-        <td mat-cell *matCellDef="let element"> {{element.burn}} </td>
-    </ng-container>
+            <!-- Burn % Column -->
+            <ng-container matColumnDef="burn">
+                <th mat-header-cell *matHeaderCellDef> Burn % </th>
+                <td mat-cell *matCellDef="let element"> {{element.burn}} </td>
+            </ng-container>
 
-    <!-- Boost % Column -->
-    <ng-container matColumnDef="boost">
-        <th mat-header-cell *matHeaderCellDef> Boost % </th>
-        <td mat-cell *matCellDef="let element"> {{element.boost}} </td>
-    </ng-container>
+            <!-- Boost % Column -->
+            <ng-container matColumnDef="boost">
+                <th mat-header-cell *matHeaderCellDef> Boost % </th>
+                <td mat-cell *matCellDef="let element"> {{element.boost}} </td>
+            </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-</table>
+        </table>
+    </div>
+</ng-container>
