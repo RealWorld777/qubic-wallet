@@ -7,7 +7,7 @@ import {
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { AuthInterceptor } from './auth-interceptor';
 import { environment } from '../../environments/environment';
-import { map, Observable, of } from 'rxjs';
+import { lastValueFrom, map, Observable, of } from 'rxjs';
 import { TokenService } from './token.service';
 import { WalletService } from './wallet.service';
 import { QubicHelper } from 'qubic-ts-library/dist/qubicHelper';
@@ -157,33 +157,23 @@ export class ApiService {
     );
   }
 
-  public async broadcastTx(tx: Uint8Array){
-    const url = `/broadcast-transaction`;
-
+  public broadcastTx(tx: Uint8Array){
+    const localVarPath = `/broadcast-transaction`;
     const binaryString = Array.from(tx)
-                              .map(byte => String.fromCharCode(byte))
-                              .join('');
-
-    // Encode to base64
+      .map((byte) => String.fromCharCode(byte))
+      .join('');
     const txEncoded = btoa(binaryString);
-    // const txEncoded = Buffer.from(tx).toString("base64");
-    console.log(txEncoded)
     const body = { encodedTransaction: txEncoded };
-  
-    try {
-      const response = await fetch(this.basePath + url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    return this.httpClient.request<any>('post', `${this.basePath}${localVarPath}`, {
+      context: new HttpContext(),
+      responseType: 'json',
+      body: body,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   };
+  
   
   public async contractTransaction(seed: string, inputType: number, inputSize: number, amount: bigint, payload: any, tick: number) {
     try {
@@ -237,7 +227,7 @@ export class ApiService {
       tx.set(signedTx, offset);
       offset += SIGNATURE_LENGTH;
 
-      const txResult = await this.broadcastTx(tx);
+      const txResult = await lastValueFrom(this.broadcastTx(tx));
       return {
         txResult,
       };
@@ -245,6 +235,20 @@ export class ApiService {
       console.error("Error signing transaction:", error);
       throw new Error("Failed to sign and broadcast transaction.");
     }
+  }
+
+  public queryStakingData(jsonData: any){
+    let localVarPath = `/querySmartContract`;
+    return this.httpClient.request<any>('post', `${this.basePath}${localVarPath}`,
+      {
+        context: new HttpContext(),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: jsonData,
+        responseType: 'json'
+      }
+    );
   }
 
   public getCurrentIpoBids(publicIds: string[]) {
