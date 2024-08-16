@@ -6,6 +6,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../core/confirm-dialog/confirm-dialog.component';
 import { TranslocoService } from '@ngneat/transloco';
 import { TimeService } from '../../services/time.service';
+import { ApiService } from 'src/app/services/api.service';
+import { UpdaterService } from 'src/app/services/updater-service';
 
 @Component({
   selector: 'app-staking',
@@ -16,7 +18,7 @@ export class StakingComponent {
   public maxAmount = 0;
   public stakeAmount = 0;
   public remainingTime = { days: 0, hours: 0, minutes: 0 };
-
+  public tick = 0;
   public stakeForm = this.fb.group({
     sourceId: ['', Validators.required],
     amount: [0, [Validators.required, Validators.min(10000000), Validators.pattern(/^[0-9]*$/)]],
@@ -31,13 +33,18 @@ export class StakingComponent {
     private walletService: WalletService,
     private timeService: TimeService,
     private dialog: MatDialog,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private apiService: ApiService,
+    private updaterService: UpdaterService
   ) {}
 
   ngOnInit(): void {
     this.redirectIfWalletNotReady();
     this.setupSourceIdValueChange();
     this.subscribeToTimeUpdates();
+    this.apiService.getCurrentTick().subscribe(s=>{
+      this.tick = s.tickInfo.tick
+    })
   }
 
   private redirectIfWalletNotReady(): void {
@@ -98,9 +105,11 @@ export class StakingComponent {
       },
     });
 
-    confirmDialog.afterClosed().subscribe((result) => {
+    confirmDialog.afterClosed().subscribe(async (result) => {
       if (result) {
-        console.log('Staking confirmed:', result);
+        const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!)
+        const res = await this.apiService.contractTransaction(seed, 2, 12, 0n, {UnlockAmount:466000000n, LockedEpoch:120}, this.tick+9)
+        console.log('Staking confirmed:', res);
       } else {
         console.log('Staking cancelled');
       }
