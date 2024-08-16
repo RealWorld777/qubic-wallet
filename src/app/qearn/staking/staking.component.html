@@ -48,7 +48,7 @@
                         </div>
                     </div>
                     <button color="accent" mat-raised-button class="full-width button" (click)="confirmLock()"
-                        >
+                        [disabled]="stakeForm.invalid">
                         {{ t('qearn.stakeQubic.stake') }}
                     </button>
                     <div class="stake-col">

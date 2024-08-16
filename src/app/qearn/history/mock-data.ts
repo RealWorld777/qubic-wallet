@@ -1,9 +1,9 @@
 export interface IStakeHistory {
   lockedEpoch: number;
-  lockedAmount: number;
+  lockedAmount: bigint;
   lockedWeeks: number;
-  totalLockedAmountInEpoch: number;
-  currentBonusAmountInEpoch: number;
+  totalLockedAmountInEpoch: bigint;
+  currentBonusAmountInEpoch: bigint;
   earlyUnlockPercent: number;
   fullUnlockPercent: number;
 }
@@ -17,12 +17,12 @@ function getRandomPercent(min: number, max: number): number {
   return Math.random() * (max - min) + min;
 }
 
-export const MOCK_LOCK_DATA: IStakeHistory[] = Array.from({ length: 50 }, (_, index) => ({
-  lockedEpoch: index + 1,
-  lockedAmount: getRandomInt(1000, 10000),
-  lockedWeeks: getRandomInt(10, 52),
-  totalLockedAmountInEpoch: getRandomInt(50000, 100000),
-  currentBonusAmountInEpoch: getRandomInt(500, 2000),
-  earlyUnlockPercent: getRandomPercent(5, 25),
-  fullUnlockPercent: getRandomPercent(80, 100),
-}));
+// export const MOCK_LOCK_DATA: IStakeHistory[] = Array.from({ length: 50 }, (_, index) => ({
+//   lockedEpoch: index + 1,
+//   lockedAmount: getRandomInt(1000, 10000),
+//   lockedWeeks: getRandomInt(10, 52),
+//   totalLockedAmountInEpoch: getRandomInt(50000, 100000),
+//   currentBonusAmountInEpoch: getRandomInt(500, 2000),
+//   earlyUnlockPercent: getRandomPercent(5, 25),
+//   fullUnlockPercent: getRandomPercent(80, 100),
+// }));

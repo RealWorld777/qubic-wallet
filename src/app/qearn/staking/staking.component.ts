@@ -10,6 +10,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { UpdaterService } from 'src/app/services/updater-service';
 import { QubicHelper } from 'qubic-ts-library/dist/qubicHelper';
 import { lastValueFrom } from 'rxjs';
+import { QearnService } from 'src/app/services/qearn.service';
 
 @Component({
   selector: 'app-staking',
@@ -17,8 +18,8 @@ import { lastValueFrom } from 'rxjs';
   styleUrls: ['./staking.component.scss'],
 })
 export class StakingComponent {
-  public maxAmount = 0;
-  public stakeAmount = 0;
+  public maxAmount = 0n;
+  public stakeAmount = 0n;
   public remainingTime = { days: 0, hours: 0, minutes: 0 };
   public tick = 0;
   public stakeForm = this.fb.group({
@@ -37,28 +38,45 @@ export class StakingComponent {
     private dialog: MatDialog,
     private transloco: TranslocoService,
     private apiService: ApiService,
-    private updaterService: UpdaterService
+    private updaterService: UpdaterService,
+    private qearnService: QearnService
   ) {}
 
   ngOnInit(): void {
     this.redirectIfWalletNotReady();
     this.setupSourceIdValueChange();
     this.subscribeToTimeUpdates();
-    this.apiService.getCurrentTick().subscribe((s) => {
-      this.tick = s.tickInfo.tick;
-    });
+  }
+
+  async lockQubic(seed: string, amount: bigint, tick: number) {
+    return this.qearnService.lockQubic(seed, amount, tick);
+  }
+
+  async unLockQubic(seed: string, amount: bigint, epoch: number, tick:number) {
+    return this.qearnService.unLockQubic(seed, amount, epoch, tick);
+  }
+
+  async getLockInfoPerEpoch(epoch: number) {
+    return this.qearnService.getLockInfoPerEpoch(epoch);
+  }
+
+  async getUserLockInfo(user: Uint8Array, epoch: number) {
+    return this.qearnService.getUserLockInfo(user, epoch);
   }
 
   private redirectIfWalletNotReady(): void {
     if (!this.walletService.isWalletReady) {
       this.router.navigate(['/public']);
     }
+    this.apiService.getCurrentTick().subscribe((s) => {
+      this.tick = s.tickInfo.tick;
+    });
   }
 
   private setupSourceIdValueChange(): void {
     this.stakeForm.controls.sourceId.valueChanges.subscribe((s) => {
       if (s) {
-        this.maxAmount = this.walletService.getSeed(s)?.balance ?? 0;
+        this.maxAmount = BigInt(this.walletService.getSeed(s)?.balance ?? 0);
       }
     });
   }
@@ -76,6 +94,7 @@ export class StakingComponent {
 
   validateAmount(event: any): void {
     const value = event.target.value;
+    this.stakeAmount = BigInt(value)
     if (!/^[0-9]*$/.test(value)) {
       this.stakeForm.controls.amount.setErrors({ pattern: true });
     }
@@ -109,15 +128,14 @@ export class StakingComponent {
 
     confirmDialog.afterClosed().subscribe(async (result) => {
       if (result) {
-        // const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
+        const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
+        const result = await this.qearnService.lockQubic(seed, this.stakeAmount, this.tick)
         // const res = await this.apiService.contractTransaction(seed, 1, 0, 466000000n, {}, this.tick+9)
         // const res = await this.apiService.contractTransaction(seed, 1, 0, 0n, {UnlockAmount:466000000n, LockedEpoch:120}, this.tick+9)
-
-        const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
-        const pubKey = (await new QubicHelper().createIdPackage(seed)).publicKey;
-        
-        const lockAmount = await this.getUserLockInfo(pubKey, 119)
-        console.log(lockAmount)
+        // const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
+        // const pubKey = (await new QubicHelper().createIdPackage(seed)).publicKey;
+        // const lockAmount = await this.getUserLockInfo(pubKey, 119)
+        // console.log(lockAmount)
       } else {
         console.log('Staking cancelled');
       }
@@ -146,59 +164,4 @@ export class StakingComponent {
   }
 
   onSubmit(): void {}
-
-  public async lockQubic(amount: bigint) {
-    const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
-    const res = await this.apiService.contractTransaction(seed, 1, 0, amount, {}, this.tick + 5);
-    return res;
-  }
-  public async unLockQubic(amount: bigint, epoch: number) {
-    const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
-    const res = await this.apiService.contractTransaction(seed, 2, 12, 0n, { UnlockAmount: amount, LockedEpoch: epoch }, this.tick + 9);
-    return res;
-  }
-  public async getLockInfoPerEpoch(epoch: number): Promise<{ lockAmount: bigint; bonusAmount: bigint }> {
-    const buffer = new ArrayBuffer(4);
-    new DataView(buffer).setUint32(0, epoch, true);
-  
-    const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-  
-    const res = await lastValueFrom(this.apiService.queryStakingData({
-      contractIndex: 6,
-      inputType: 1,
-      inputSize: 4,
-      requestData: base64String,
-    }));
-  
-    const bytes = Uint8Array.from(atob(res.responseData), char => char.charCodeAt(0));
-  
-    const dataView = new DataView(bytes.buffer);
-    const lockAmount = dataView.getBigUint64(0, true);
-    const bonusAmount = dataView.getBigUint64(8, true);
-  
-    return { lockAmount, bonusAmount };
-  }
-  
-  public async getUserLockInfo(user: Uint8Array, epoch: number): Promise<bigint> {
-    const buffer = new ArrayBuffer(36);
-    const dataView = new DataView(buffer);
-
-    user.forEach((byte, index) => dataView.setUint8(index, byte));
-    dataView.setUint32(32, epoch, true);
-
-    const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-
-    const res = await lastValueFrom(
-      this.apiService.queryStakingData({
-        contractIndex: 6,
-        inputType: 2,
-        inputSize: 36,
-        requestData: base64String,
-      })
-    );
-
-    const bytes = Uint8Array.from(atob(res.responseData), (char) => char.charCodeAt(0));
-
-    return new DataView(bytes.buffer).getBigUint64(0, true);
-  }
 }
