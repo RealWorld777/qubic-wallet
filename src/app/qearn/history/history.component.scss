@@ -1,6 +1,5 @@
 .stake-history {
-  width: 100%;
-  overflow-x: auto; /* Makes the table scrollable horizontally on small screens */
+  overflow-x: hidden; /* Makes the table scrollable horizontally on small screens */
 }
 
 .table-responsive {
@@ -25,6 +24,17 @@ td.mat-cell {
   color: #61f0fe;
   padding: 8px 24px;
   cursor: pointer;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+}
+.paginator{
+  border-radius: 5px;
 }
 
 @media screen and (max-width: 768px) {

@@ -11,6 +11,7 @@ import { UpdaterService } from 'src/app/services/updater-service';
 import { QubicHelper } from 'qubic-ts-library/dist/qubicHelper';
 import { lastValueFrom } from 'rxjs';
 import { QearnService } from 'src/app/services/qearn.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-staking',
@@ -39,7 +40,8 @@ export class StakingComponent {
     private transloco: TranslocoService,
     private apiService: ApiService,
     private updaterService: UpdaterService,
-    private qearnService: QearnService
+    private qearnService: QearnService,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -52,7 +54,7 @@ export class StakingComponent {
     return this.qearnService.lockQubic(seed, amount, tick);
   }
 
-  async unLockQubic(seed: string, amount: bigint, epoch: number, tick:number) {
+  async unLockQubic(seed: string, amount: bigint, epoch: number, tick: number) {
     return this.qearnService.unLockQubic(seed, amount, epoch, tick);
   }
 
@@ -94,7 +96,7 @@ export class StakingComponent {
 
   validateAmount(event: any): void {
     const value = event.target.value;
-    this.stakeAmount = BigInt(value)
+    this.stakeAmount = BigInt(value);
     if (!/^[0-9]*$/.test(value)) {
       this.stakeForm.controls.amount.setErrors({ pattern: true });
     }
@@ -128,16 +130,22 @@ export class StakingComponent {
 
     confirmDialog.afterClosed().subscribe(async (result) => {
       if (result) {
-        const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
-        const result = await this.qearnService.lockQubic(seed, this.stakeAmount, this.tick)
-        // const res = await this.apiService.contractTransaction(seed, 1, 0, 466000000n, {}, this.tick+9)
-        // const res = await this.apiService.contractTransaction(seed, 1, 0, 0n, {UnlockAmount:466000000n, LockedEpoch:120}, this.tick+9)
-        // const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
-        // const pubKey = (await new QubicHelper().createIdPackage(seed)).publicKey;
-        // const lockAmount = await this.getUserLockInfo(pubKey, 119)
-        // console.log(lockAmount)
+        try {
+          const seed = await this.walletService.revealSeed(this.stakeForm.controls.sourceId.value!);
+          const result = await this.qearnService.lockQubic(seed, this.stakeAmount, this.tick);
+          if (result.txResult)
+            this._snackBar.open('Success!', this.transloco.translate('general.close'), {
+              duration: 0,
+              panelClass: 'success',
+            });
+        } catch (error) {
+          console.log(error);
+          this._snackBar.open('Something went wrong!', this.transloco.translate('general.close'), {
+            duration: 0,
+            panelClass: 'error',
+          });
+        }
       } else {
-        console.log('Staking cancelled');
       }
     });
   }

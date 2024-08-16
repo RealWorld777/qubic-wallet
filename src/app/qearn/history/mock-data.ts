@@ -1,4 +1,5 @@
 export interface IStakeHistory {
+  publicId: string;
   lockedEpoch: number;
   lockedAmount: bigint;
   lockedWeeks: number;
